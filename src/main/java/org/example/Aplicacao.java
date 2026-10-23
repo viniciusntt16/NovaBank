@@ -1,10 +1,28 @@
 package org.example;
+
+import org.example.Console.ClienteConsole;
+import org.example.Console.ContaConsole;
+import org.example.Service.ClienteService;
+import org.example.Service.ContaService;
+
 import java.util.Scanner;
 
 public class Aplicacao {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        ClienteService clienteService = new ClienteService();
+        ContaService contaService = new ContaService();
+
+        ClienteConsole clienteConsole = new ClienteConsole(clienteService, scanner);
+
+        ContaConsole contaConsole = new ContaConsole(
+                contaService,
+                clienteService,
+                scanner
+        );
+
         boolean executando = true;
 
         while (executando) {
@@ -18,43 +36,27 @@ public class Aplicacao {
 
                 switch (opcao) {
                     case 1:
-                        System.out.println("Cadastrar cliente - em desenvolvimento.");
+                        clienteConsole.cadastrarCliente();
                         break;
 
                     case 2:
-                        System.out.println("Listar clientes - em desenvolvimento.");
+                        clienteConsole.listarClientes();
                         break;
 
                     case 3:
-                        System.out.println("Buscar cliente por CPF - em desenvolvimento.");
+                        clienteConsole.buscarClientePorCpf();
                         break;
 
                     case 4:
-                        System.out.println("Criar conta - em desenvolvimento.");
+                        contaConsole.criarConta();
                         break;
 
                     case 5:
-                        System.out.println("Listar contas - em desenvolvimento.");
+                        contaConsole.listarContas();
                         break;
 
                     case 6:
-                        System.out.println("Consultar saldo - em desenvolvimento.");
-                        break;
-
-                    case 7:
-                        System.out.println("Realizar depósito - em desenvolvimento.");
-                        break;
-
-                    case 8:
-                        System.out.println("Realizar saque - em desenvolvimento.");
-                        break;
-
-                    case 9:
-                        System.out.println("Realizar transferência - em desenvolvimento.");
-                        break;
-
-                    case 10:
-                        System.out.println("Consultar histórico - em desenvolvimento.");
+                        contaConsole.consultarSaldo();
                         break;
 
                     case 0:
@@ -63,11 +65,11 @@ public class Aplicacao {
                         break;
 
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        System.out.println("Opção inválida.");
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Entrada inválida. Digite somente um número.");
+                System.out.println("Digite uma opção numérica válida.");
             }
 
             System.out.println();
@@ -76,7 +78,7 @@ public class Aplicacao {
         scanner.close();
     }
 
-    public static void exibirMenu() {
+    private static void exibirMenu() {
         System.out.println("========== NOVABANK ==========");
         System.out.println("1 - Cadastrar cliente");
         System.out.println("2 - Listar clientes");
@@ -84,10 +86,6 @@ public class Aplicacao {
         System.out.println("4 - Criar conta");
         System.out.println("5 - Listar contas");
         System.out.println("6 - Consultar saldo");
-        System.out.println("7 - Realizar depósito");
-        System.out.println("8 - Realizar saque");
-        System.out.println("9 - Realizar transferência");
-        System.out.println("10 - Consultar histórico");
         System.out.println("0 - Sair");
     }
 }
