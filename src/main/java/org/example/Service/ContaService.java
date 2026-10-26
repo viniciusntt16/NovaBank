@@ -43,8 +43,61 @@ public class ContaService {
         throw new ContaException("Conta número " + numero + " não encontrada.");
     }
 
-
     public List<Conta> listarContas() {
         return List.copyOf(contas);
     }
+
+    public void depositar(int numeroConta, long valorEmCentavos) {
+        Conta conta = buscarContaPorNumero(numeroConta);
+        conta.depositar(valorEmCentavos);
+    }
+
+    public void sacar(int numeroConta, long valorEmCentavos) {
+        Conta conta = buscarContaPorNumero(numeroConta);
+        conta.sacar(valorEmCentavos);
+    }
+
+    public void transferir(
+            int numeroContaOrigem,
+            int numeroContaDestino,
+            long valorEmCentavos
+    ) {
+        if (numeroContaOrigem == numeroContaDestino) {
+            throw new ContaException("Não é possível transferir para a mesma conta.");
+        }
+
+        if (valorEmCentavos <= 0) {
+            throw new ContaException("O valor da transferência deve ser maior que zero.");
+        }
+
+        Conta contaOrigem = buscarContaPorNumero(numeroContaOrigem);
+        Conta contaDestino = buscarContaPorNumero(numeroContaDestino);
+
+        if (valorEmCentavos > contaOrigem.getSaldo()) {
+            throw new ContaException("Saldo insuficiente para realizar a transferência.");
+        }
+
+        if (Long.MAX_VALUE - contaDestino.getSaldo() < valorEmCentavos) {
+            throw new ContaException("O saldo máximo da conta de destino foi excedido.");
+        }
+
+        contaOrigem.debitarTransferencia(
+                valorEmCentavos,
+                contaDestino.getNumero()
+        );
+
+        contaDestino.creditarTransferencia(
+                valorEmCentavos,
+                contaOrigem.getNumero()
+        );
+    }
+
+
+    public List<String> consultarHistorico(int numeroConta) {
+        Conta conta = buscarContaPorNumero(numeroConta);
+
+        return conta.getHistorico();
+    }
+
+
 }

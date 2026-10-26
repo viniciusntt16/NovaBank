@@ -59,6 +59,22 @@ public class Aplicacao {
                         contaConsole.consultarSaldo();
                         break;
 
+                    case 7:
+                        contaConsole.realizarDeposito();
+                        break;
+
+                    case 8:
+                        contaConsole.realizarSaque();
+                        break;
+
+                    case 9:
+                        contaConsole.realizarTransferencia();
+                        break;
+
+                    case 10:
+                        contaConsole.consultarHistorico();
+                        break;
+
                     case 0:
                         executando = false;
                         System.out.println("Programa encerrado. Até logo!");
@@ -86,6 +102,11 @@ public class Aplicacao {
         System.out.println("4 - Criar conta");
         System.out.println("5 - Listar contas");
         System.out.println("6 - Consultar saldo");
+        System.out.println("7 - Realizar depósito");
+        System.out.println("8 - Realizar saque");
+        System.out.println("9 - Realizar transferência");
+        System.out.println("10 - Consultar histórico");
         System.out.println("0 - Sair");
     }
+
 }
