@@ -10,6 +10,7 @@ public class Conta {
     private final int numero;
     private final String titular;
     private long saldo;
+    private boolean bloqueada;
     private final List<String> historico = new ArrayList<>();
 
     public Conta(int numero, String titular, long saldo) {
@@ -23,6 +24,7 @@ public class Conta {
     }
 
     public void depositar(long valorEmCentavos) {
+        verificarMovimentacaoPermitida();
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor do depósito deve ser maior que zero.");
         }
@@ -40,6 +42,7 @@ public class Conta {
     }
 
     public void sacar(long valorEmCentavos) {
+        verificarMovimentacaoPermitida();
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor do saque deve ser maior que zero.");
         }
@@ -60,6 +63,7 @@ public class Conta {
             long valorEmCentavos,
             int numeroContaDestino
     ) {
+        verificarMovimentacaoPermitida();
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor da transferência deve ser maior que zero.");
         }
@@ -81,6 +85,7 @@ public class Conta {
             long valorEmCentavos,
             int numeroContaOrigem
     ) {
+        verificarMovimentacaoPermitida();
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor da transferência deve ser maior que zero.");
         }
@@ -98,11 +103,47 @@ public class Conta {
         );
     }
 
+    public void bloquear() {
+        if (bloqueada) {
+            throw new ContaException("A conta já está bloqueada.");
+        }
+        bloqueada = true;
+        registrarHistorico("CONTA BLOQUEADA.");
+    }
+
+    public void desbloquear() {
+        if (!bloqueada) {
+            throw new ContaException("A conta já está desbloqueada.");
+        }
+        bloqueada = false;
+        registrarHistorico("CONTA DESBLOQUEADA.");
+    }
+
+    public boolean isBloqueada() {
+        return bloqueada;
+    }
+
+    private void verificarMovimentacaoPermitida() {
+        if (bloqueada) {
+            throw new ContaException(
+                    "A conta está bloqueada e não pode realizar movimentações."
+            );
+        }
+    }
+
+    public String getStatus() {
+        if (bloqueada) {
+            return "BLOQUEADA";
+        }
+        return "ATIVA";
+    }
+
     @Override
     public String toString() {
         return "Número da conta: " + numero +
                 "\nTitular: " + titular +
-                "\nSaldo: " + getSaldoFormatado();
+                "\nSaldo: " + getSaldoFormatado() +
+                "\nStatus: " + getStatus();
     }
 
     public List<String> getHistorico() {

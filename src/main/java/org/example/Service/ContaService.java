@@ -73,12 +73,26 @@ public class ContaService {
         Conta contaOrigem = buscarContaPorNumero(numeroContaOrigem);
         Conta contaDestino = buscarContaPorNumero(numeroContaDestino);
 
+        if (contaOrigem.isBloqueada()) {
+            throw new ContaException(
+                    "A conta de origem está bloqueada e não pode realizar transferências."
+            );
+        }
+
+        if (contaDestino.isBloqueada()) {
+            throw new ContaException(
+                    "A conta de destino está bloqueada e não pode receber transferências."
+            );
+        }
+
         if (valorEmCentavos > contaOrigem.getSaldo()) {
             throw new ContaException("Saldo insuficiente para realizar a transferência.");
         }
 
         if (Long.MAX_VALUE - contaDestino.getSaldo() < valorEmCentavos) {
-            throw new ContaException("O saldo máximo da conta de destino foi excedido.");
+            throw new ContaException(
+                    "O saldo máximo da conta de destino foi excedido."
+            );
         }
 
         contaOrigem.debitarTransferencia(
@@ -93,11 +107,21 @@ public class ContaService {
     }
 
 
+
     public List<String> consultarHistorico(int numeroConta) {
         Conta conta = buscarContaPorNumero(numeroConta);
 
         return conta.getHistorico();
     }
 
+    public void bloquearConta(int numeroConta) {
+        Conta conta = buscarContaPorNumero(numeroConta);
+        conta.bloquear();
+    }
+
+    public void desbloquearConta(int numeroConta) {
+        Conta conta = buscarContaPorNumero(numeroConta);
+        conta.desbloquear();
+    }
 
 }

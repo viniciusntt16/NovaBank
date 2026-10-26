@@ -75,6 +75,18 @@ public class Aplicacao {
                         contaConsole.consultarHistorico();
                         break;
 
+                    case 11:
+                        clienteConsole.atualizarCliente();
+                        break;
+
+                    case 12:
+                        contaConsole.bloquearConta();
+                        break;
+
+                    case 13:
+                        contaConsole.desbloquearConta();
+                        break;
+
                     case 0:
                         executando = false;
                         System.out.println("Programa encerrado. Até logo!");
@@ -106,6 +118,9 @@ public class Aplicacao {
         System.out.println("8 - Realizar saque");
         System.out.println("9 - Realizar transferência");
         System.out.println("10 - Consultar histórico");
+        System.out.println("11 - Atualizar dados do cliente");
+        System.out.println("12 - Bloquear conta");
+        System.out.println("13 - Desbloquear conta");
         System.out.println("0 - Sair");
     }
 

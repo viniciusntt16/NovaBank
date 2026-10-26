@@ -177,4 +177,33 @@ public class ContaConsole {
             System.out.println("Erro: " + e.getMessage());
         }
     }
+
+    public void bloquearConta() {
+        alterarStatusConta(true);
+    }
+
+    public void desbloquearConta() {
+        alterarStatusConta(false);
+    }
+
+    private void alterarStatusConta(boolean bloquear) {
+        try {
+            System.out.print("Informe o número da conta: ");
+            int numeroConta = Integer.parseInt(scanner.nextLine());
+
+            if (bloquear) {
+                contaService.bloquearConta(numeroConta);
+                System.out.println("Conta bloqueada com sucesso!");
+            } else {
+                contaService.desbloquearConta(numeroConta);
+                System.out.println("Conta desbloqueada com sucesso!");
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Número da conta inválido.");
+
+        } catch (ContaException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
 }
