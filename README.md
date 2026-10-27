@@ -1,27 +1,45 @@
-# NovaBank
-Implementação de um projeto em java para implementar um sistema bancário simples
-
 # NovaBank — Sistema Bancário em Java
 
 Projeto prático desenvolvido em Java para simular um sistema bancário simples executado pelo terminal.
 
-O sistema permite cadastrar clientes, criar contas bancárias e realizar operações como depósito, saque, transferência e consulta de histórico.
+O sistema permite cadastrar clientes, criar contas bancárias e realizar operações como depósito, saque, transferência, bloqueio de conta e consulta de histórico.
 
 ## Funcionalidades
 
-- Cadastro de clientes com nome e CPF;
-- Validação de nome vazio, CPF vazio, CPF inválido e CPF duplicado;
+### Clientes
+
+- Cadastro de clientes com nome, CPF, e-mail e telefone;
+- E-mail e telefone opcionais;
 - Listagem de clientes;
 - Busca de cliente por CPF;
+- Atualização de nome, e-mail e telefone;
+- Validação de nome vazio, CPF vazio, CPF inválido e CPF duplicado.
+
+### Contas
+
 - Criação de conta associada a um cliente existente;
 - Geração automática de número de conta sequencial;
 - Listagem de contas;
 - Consulta de saldo;
+- Consulta de status da conta;
+- Bloqueio e desbloqueio de contas.
+
+### Operações bancárias
+
 - Depósito;
 - Saque com validação de saldo suficiente;
 - Transferência entre contas;
-- Consulta de histórico de movimentações;
-- Tratamento de entradas inválidas e exceções de negócio.
+- Validação de valores positivos;
+- Validação de estouro máximo do tipo `long`;
+- Bloqueio de movimentações em contas bloqueadas;
+- Consulta de histórico de movimentações.
+
+### Histórico e exportação
+
+- Histórico armazenado por meio da classe `Movimentacao`;
+- Tipos de movimentação definidos pelo enum `TipoMovimentacao`;
+- Registro de depósito, saque, transferência enviada, transferência recebida, bloqueio e desbloqueio;
+- Exportação do histórico de todas as contas para um arquivo TXT ao encerrar a aplicação.
 
 ## Regras de negócio
 
@@ -29,13 +47,17 @@ O sistema permite cadastrar clientes, criar contas bancárias e realizar operaç
 - Não é permitido cadastrar clientes com nome ou CPF vazio;
 - Não é permitido cadastrar dois clientes com o mesmo CPF;
 - Uma conta só pode ser criada para um cliente já cadastrado;
-- Toda conta começa com saldo igual a zero;
+- Toda conta começa com saldo igual a zero e status ativo;
 - Os valores monetários são armazenados em centavos usando o tipo `long`;
 - Depósitos, saques e transferências devem possuir valor maior que zero;
 - Um saque ou transferência só é permitido quando existe saldo suficiente;
 - Não é permitido transferir valores para a mesma conta;
+- Uma conta bloqueada não pode realizar depósitos, saques ou transferências;
+- Uma conta bloqueada não pode receber transferências;
 - Operações rejeitadas não alteram saldo nem histórico;
-- Cada transferência gera um registro no histórico da conta de origem e outro na conta de destino.
+- Cada transferência gera um registro no histórico da conta de origem e outro na conta de destino;
+- O CPF não pode ser alterado, pois identifica o cliente;
+- Ao encerrar a aplicação, o usuário pode optar por exportar o histórico para um arquivo TXT.
 
 ## Valores em centavos
 
@@ -52,6 +74,7 @@ Os valores são informados e armazenados em centavos para evitar problemas de pr
 ## Tecnologias utilizadas
 
 - Java 21;
+- Maven;
 - Docker;
 - Docker Compose;
 - Git;
@@ -65,6 +88,8 @@ NovaBank/
 │   ├── 01-build-docker.png
 │   ├── 02-execucao-docker-run.png
 │   └── ...
+├── exportacoes/
+│   └── historico-novabank.txt
 ├── src/
 │   ├── main/
 │   │   ├── java/
@@ -77,15 +102,18 @@ NovaBank/
 │   │   │           │   └── ContaConsole.java
 │   │   │           ├── Entidades/
 │   │   │           │   ├── Cliente.java
-│   │   │           │   └── Conta.java
+│   │   │           │   ├── Conta.java
+│   │   │           │   ├── Movimentacao.java
+│   │   │           │   └── TipoMovimentacao.java
 │   │   │           ├── Exceptions/
 │   │   │           │   ├── ClienteException.java
 │   │   │           │   └── ContaException.java
 │   │   │           └── Service/
 │   │   │               ├── ClienteService.java
-│   │   │               └── ContaService.java
-│   │   └── resources/
-│   └── test/
+│   │   │               ├── ContaService.java
+│   │   │               └── ExportacaoHistoricoService.java
+│   │   ├── resources/
+│   │   └── test/
 ├── target/
 ├── .dockerignore
 ├── .gitignore
@@ -95,11 +123,14 @@ NovaBank/
 └── README.md
 ```
 
+> A pasta `target` é gerada automaticamente pelo Maven após a compilação.
+
 ## Pré-requisitos
 
 Antes de executar o projeto, tenha instalado:
 
 - Java 21;
+- Maven;
 - Docker Desktop;
 - Docker Compose;
 - Git, caso deseje clonar o repositório.
@@ -117,9 +148,6 @@ Depois execute a classe principal:
 ```bash
 java -cp target/classes org.example.Aplicacao
 ```
-
-
-> Caso o comando com `**` não funcione no seu terminal, compile os arquivos pela IDE ou utilize um comando compatível com o seu sistema operacional.
 
 ## Execução com Docker
 
@@ -144,6 +172,8 @@ Parâmetros utilizados:
 - `-t`: cria um terminal interativo;
 - `--name`: define um nome para o container.
 
+> Ao usar apenas esse comando, o arquivo TXT será criado dentro do container. Como o container é removido ao encerrar, o arquivo também será removido.
+
 ## Execução com Docker Compose
 
 ### Construir a imagem
@@ -158,11 +188,26 @@ docker compose build
 docker compose run --rm novabank
 ```
 
+O arquivo `docker-compose.yml` possui um volume configurado para que os arquivos exportados sejam mantidos no computador após o encerramento do container.
+
+```yaml
+volumes:
+  - ./exportacoes:/app/exportacoes
+```
+
+Ao escolher salvar o histórico ao sair da aplicação, o arquivo será criado em:
+
+```text
+exportacoes/historico-novabank.txt
+```
+
 ## Persistência dos dados
 
-Os dados são mantidos apenas em memória durante a execução da aplicação.
+Os clientes, contas, saldos e históricos são armazenados apenas em memória durante a execução da aplicação.
 
-Ao encerrar o programa ou remover o container, os clientes, contas, saldos e históricos são perdidos.
+Ao encerrar o programa, esses dados são perdidos.
+
+Entretanto, caso o usuário escolha a opção de exportar o histórico antes de sair, será criado um arquivo TXT com as movimentações, saldos e status das contas.
 
 ## Cenários testados
 
@@ -171,6 +216,7 @@ Ao encerrar o programa ou remover o container, os clientes, contas, saldos e his
 | Cadastro com nome vazio | Operação recusada |
 | Cadastro com CPF vazio ou inválido | Operação recusada |
 | Cadastro com CPF duplicado | Operação recusada |
+| Atualização de nome, e-mail ou telefone | Dados atualizados corretamente |
 | Criação de conta para cliente inexistente | Operação recusada |
 | Criação de conta para cliente existente | Conta criada com saldo zero |
 | Depósito com valor positivo | Saldo atualizado |
@@ -179,16 +225,20 @@ Ao encerrar o programa ou remover o container, os clientes, contas, saldos e his
 | Saque com saldo insuficiente | Operação recusada |
 | Transferência entre contas diferentes | Saldo debitado na origem e creditado no destino |
 | Transferência para a mesma conta | Operação recusada |
-| Consulta de histórico | Exibe apenas operações concluídas |
+| Bloqueio de conta | Status alterado para bloqueada |
+| Movimentação em conta bloqueada | Operação recusada |
+| Desbloqueio de conta | Status alterado para ativa |
+| Consulta de histórico | Exibe movimentações concluídas na ordem correta |
+| Exportação de histórico | Arquivo TXT criado com os dados das contas e movimentações |
 | Execução com Docker | Aplicação iniciada no container |
-| Execução com Docker Compose | Aplicação iniciada no container |
+| Execução com Docker Compose | Aplicação iniciada no container e arquivo TXT preservado no computador |
 
 ## Evidências
 
 As evidências dos testes realizados com Docker e Docker Compose estão disponíveis na pasta:
 
 ```text
-evidencias/
+Evidencias/
 ```
 
 Exemplos de evidências incluídas:
@@ -202,7 +252,7 @@ Exemplos de evidências incluídas:
 
 Desenvolvido por: **Vinícius Aguiar Basilio**
 
-GitHub: **https:https://github.com/viniciusntt16**
+GitHub: **@viniciusntt16**
 
 
 ### Saidas do console

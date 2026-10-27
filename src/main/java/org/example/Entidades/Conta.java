@@ -11,7 +11,7 @@ public class Conta {
     private final String titular;
     private long saldo;
     private boolean bloqueada;
-    private final List<String> historico = new ArrayList<>();
+    private final List<Movimentacao> historico = new ArrayList<>();
 
     public Conta(int numero, String titular, long saldo) {
         this.numero = numero;
@@ -19,12 +19,23 @@ public class Conta {
         this.saldo = saldo;
     }
 
-    private void registrarHistorico(String descricao) {
-        historico.add(descricao);
+    private void registrarHistorico(
+            TipoMovimentacao tipo,
+            long valorEmCentavos,
+            Integer numeroContaRelacionada
+    ) {
+        Movimentacao movimentacao = new Movimentacao(
+                tipo,
+                valorEmCentavos,
+                saldo,
+                numeroContaRelacionada
+        );
+        historico.add(movimentacao);
     }
 
     public void depositar(long valorEmCentavos) {
         verificarMovimentacaoPermitida();
+
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor do depósito deve ser maior que zero.");
         }
@@ -36,13 +47,15 @@ public class Conta {
         saldo += valorEmCentavos;
 
         registrarHistorico(
-                "DEPÓSITO | Valor: " + valorEmCentavos
-                        + " centavos | Saldo: " + saldo + " centavos"
+                TipoMovimentacao.DEPOSITO,
+                valorEmCentavos,
+                null
         );
     }
 
     public void sacar(long valorEmCentavos) {
         verificarMovimentacaoPermitida();
+
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor do saque deve ser maior que zero.");
         }
@@ -54,8 +67,9 @@ public class Conta {
         saldo -= valorEmCentavos;
 
         registrarHistorico(
-                "SAQUE | Valor: " + valorEmCentavos
-                        + " centavos | Saldo: " + saldo + " centavos"
+                TipoMovimentacao.SAQUE,
+                valorEmCentavos,
+                null
         );
     }
 
@@ -64,6 +78,7 @@ public class Conta {
             int numeroContaDestino
     ) {
         verificarMovimentacaoPermitida();
+
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor da transferência deve ser maior que zero.");
         }
@@ -75,9 +90,9 @@ public class Conta {
         saldo -= valorEmCentavos;
 
         registrarHistorico(
-                "TRANSFERÊNCIA ENVIADA | Valor: " + valorEmCentavos
-                        + " centavos | Destino: " + numeroContaDestino
-                        + " | Saldo: " + saldo + " centavos"
+                TipoMovimentacao.TRANSFERENCIA_ENVIADA,
+                valorEmCentavos,
+                numeroContaDestino
         );
     }
 
@@ -86,6 +101,7 @@ public class Conta {
             int numeroContaOrigem
     ) {
         verificarMovimentacaoPermitida();
+
         if (valorEmCentavos <= 0) {
             throw new ContaException("O valor da transferência deve ser maior que zero.");
         }
@@ -97,9 +113,9 @@ public class Conta {
         saldo += valorEmCentavos;
 
         registrarHistorico(
-                "TRANSFERÊNCIA RECEBIDA | Valor: " + valorEmCentavos
-                        + " centavos | Origem: " + numeroContaOrigem
-                        + " | Saldo: " + saldo + " centavos"
+                TipoMovimentacao.TRANSFERENCIA_RECEBIDA,
+                valorEmCentavos,
+                numeroContaOrigem
         );
     }
 
@@ -107,16 +123,28 @@ public class Conta {
         if (bloqueada) {
             throw new ContaException("A conta já está bloqueada.");
         }
+
         bloqueada = true;
-        registrarHistorico("CONTA BLOQUEADA.");
+
+        registrarHistorico(
+                TipoMovimentacao.CONTA_BLOQUEADA,
+                0L,
+                null
+        );
     }
 
     public void desbloquear() {
         if (!bloqueada) {
             throw new ContaException("A conta já está desbloqueada.");
         }
+
         bloqueada = false;
-        registrarHistorico("CONTA DESBLOQUEADA.");
+
+        registrarHistorico(
+                TipoMovimentacao.CONTA_DESBLOQUEADA,
+                0L,
+                null
+        );
     }
 
     public boolean isBloqueada() {
@@ -146,7 +174,7 @@ public class Conta {
                 "\nStatus: " + getStatus();
     }
 
-    public List<String> getHistorico() {
+    public List<Movimentacao> getHistorico() {
         return List.copyOf(historico);
     }
 

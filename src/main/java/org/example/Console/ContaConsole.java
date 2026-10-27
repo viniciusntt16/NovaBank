@@ -2,6 +2,7 @@ package org.example.Console;
 
 import org.example.Entidades.Cliente;
 import org.example.Entidades.Conta;
+import org.example.Entidades.Movimentacao;
 import org.example.Exceptions.ContaException;
 import org.example.Service.ClienteService;
 import org.example.Service.ContaService;
@@ -157,7 +158,7 @@ public class ContaConsole {
             System.out.print("Informe o número da conta: ");
             int numeroConta = Integer.parseInt(scanner.nextLine());
 
-            List<String> historico = contaService.consultarHistorico(numeroConta);
+            List<Movimentacao> historico = contaService.consultarHistorico(numeroConta);
 
             if (historico.isEmpty()) {
                 System.out.println("Não há movimentações para esta conta.");
@@ -166,8 +167,9 @@ public class ContaConsole {
 
             System.out.println("===== HISTÓRICO DA CONTA " + numeroConta + " =====");
 
-            for (String movimentacao : historico) {
+            for (Movimentacao movimentacao : historico) {
                 System.out.println(movimentacao);
+                System.out.println("------------------------------");
             }
 
         } catch (NumberFormatException e) {

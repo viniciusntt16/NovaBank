@@ -36,8 +36,8 @@ public class ClienteConsole {
             System.out.println("Cliente cadastrado com sucesso!");
             System.out.println("Nome: " + cliente.getNome());
             System.out.println("CPF: " + cliente.getCpf());
-            System.out.println("Email: " + cliente.getCpf());
-            System.out.println("Telefone: " + cliente.getCpf());
+            System.out.println("Email: " + cliente.getEmail());
+            System.out.println("Telefone: " + cliente.getTelefone());
 
         } catch (ClienteException e) {
             System.out.println("Erro: " + e.getMessage());

@@ -4,6 +4,9 @@ import org.example.Console.ClienteConsole;
 import org.example.Console.ContaConsole;
 import org.example.Service.ClienteService;
 import org.example.Service.ContaService;
+import org.example.Service.ExportacaoHistoricoService;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import java.util.Scanner;
 
@@ -14,6 +17,8 @@ public class Aplicacao {
 
         ClienteService clienteService = new ClienteService();
         ContaService contaService = new ContaService();
+        ExportacaoHistoricoService exportacaoHistoricoService =
+                new ExportacaoHistoricoService();
 
         ClienteConsole clienteConsole = new ClienteConsole(clienteService, scanner);
 
@@ -88,8 +93,12 @@ public class Aplicacao {
                         break;
 
                     case 0:
+                        confirmarSaida(
+                                scanner,
+                                contaService,
+                                exportacaoHistoricoService
+                        );
                         executando = false;
-                        System.out.println("Programa encerrado. Até logo!");
                         break;
 
                     default:
@@ -122,6 +131,44 @@ public class Aplicacao {
         System.out.println("12 - Bloquear conta");
         System.out.println("13 - Desbloquear conta");
         System.out.println("0 - Sair");
+    }
+
+    private static void confirmarSaida(
+            Scanner scanner,
+            ContaService contaService,
+            ExportacaoHistoricoService exportacaoHistoricoService
+    ) {
+        while (true) {
+            System.out.println("Deseja salvar o histórico desta interação?");
+            System.out.println("1 - Sim");
+            System.out.println("2 - Não");
+            System.out.print("Escolha uma opção: ");
+
+            String entrada = scanner.nextLine();
+
+            switch (entrada) {
+                case "1":
+                    try {
+                        Path arquivo = exportacaoHistoricoService.exportarHistorico(
+                                contaService.listarContas()
+                        );
+                        System.out.println(
+                                "Histórico salvo com sucesso em: " + arquivo
+                        );
+                    } catch (IOException e) {
+                        System.out.println(
+                                "Não foi possível salvar o histórico: " + e.getMessage()
+                        );
+                    }
+                    return;
+
+                case "2":
+                    System.out.println("Histórico não será salvo.");
+                    return;
+                default:
+                    System.out.println("Opção inválida. Digite 1 ou 2.");
+            }
+        }
     }
 
 }

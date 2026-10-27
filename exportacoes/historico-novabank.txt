@@ -1,0 +1,22 @@
+===== NOVABANK - HISTÓRICO DE MOVIMENTAÇÕES =====
+
+Número da conta: 1001
+Titular: Vinicius
+Saldo final: R$ 50,00
+Status: ATIVA
+Movimentações:
+- DEPÓSITO | Valor: R$ 100,00 | Saldo após operação: R$ 100,00
+- SAQUE | Valor: R$ 30,00 | Saldo após operação: R$ 70,00
+- TRANSFERÊNCIA ENVIADA | Valor: R$ 20,00 | Destino: 1002 | Saldo após operação: R$ 50,00
+
+----------------------------------------
+
+Número da conta: 1002
+Titular: Lukas
+Saldo final: R$ 20,00
+Status: ATIVA
+Movimentações:
+- TRANSFERÊNCIA RECEBIDA | Valor: R$ 20,00 | Origem: 1001 | Saldo após operação: R$ 20,00
+
+----------------------------------------
+

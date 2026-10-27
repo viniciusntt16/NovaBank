@@ -2,6 +2,7 @@ package org.example.Service;
 
 import org.example.Entidades.Cliente;
 import org.example.Entidades.Conta;
+import org.example.Entidades.Movimentacao;
 import org.example.Exceptions.ContaException;
 
 import java.util.ArrayList;
@@ -108,11 +109,12 @@ public class ContaService {
 
 
 
-    public List<String> consultarHistorico(int numeroConta) {
+    public List<Movimentacao> consultarHistorico(int numeroConta) {
         Conta conta = buscarContaPorNumero(numeroConta);
 
         return conta.getHistorico();
     }
+
 
     public void bloquearConta(int numeroConta) {
         Conta conta = buscarContaPorNumero(numeroConta);
